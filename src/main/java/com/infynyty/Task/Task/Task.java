@@ -1,10 +1,9 @@
 package com.infynyty.Task.Task;
 
 
-import com.infynyty.Task.Player.TaskParticipant;
-import com.infynyty.Task.TaskStartNode;
-import com.infynyty.Task.TaskState;
-import com.infynyty.Task.TaskNode;
+import com.infynyty.Task.Participant.TaskParticipant;
+import com.infynyty.Task.Graph.TaskStartNode;
+import com.infynyty.Task.Graph.TaskNode;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;

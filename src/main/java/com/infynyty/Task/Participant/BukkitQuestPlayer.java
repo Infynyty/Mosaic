@@ -1,4 +1,4 @@
-package com.infynyty.Task.Player;
+package com.infynyty.Task.Participant;
 
 public class BukkitQuestPlayer implements QuestPlayer {
     @Override

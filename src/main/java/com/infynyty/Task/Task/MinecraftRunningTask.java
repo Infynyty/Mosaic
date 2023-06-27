@@ -1,7 +1,7 @@
 package com.infynyty.Task.Task;
 
-import com.infynyty.Task.Player.BukkitQuestPlayer;
-import com.infynyty.Task.TaskNode;
+import com.infynyty.Task.Participant.BukkitQuestPlayer;
+import com.infynyty.Task.Graph.TaskNode;
 import org.jetbrains.annotations.NotNull;
 
 public class MinecraftRunningTask extends RunningTask<BukkitQuestPlayer> {
@@ -10,7 +10,7 @@ public class MinecraftRunningTask extends RunningTask<BukkitQuestPlayer> {
     }
 
     @Override
-    public TaskNode getNode() {
+    public TaskNode getCurrentNode() {
         return null;
     }
 

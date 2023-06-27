@@ -1,4 +1,4 @@
-package com.infynyty.Task;
+package com.infynyty.Task.Graph;
 
 public interface TaskStartNode extends TaskNode {
 }

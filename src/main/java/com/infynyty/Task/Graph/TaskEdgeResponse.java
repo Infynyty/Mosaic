@@ -1,4 +1,4 @@
-package com.infynyty.Task;
+package com.infynyty.Task.Graph;
 
 import com.infynyty.Task.Task.TaskNotRunning;
 import org.jetbrains.annotations.NotNull;

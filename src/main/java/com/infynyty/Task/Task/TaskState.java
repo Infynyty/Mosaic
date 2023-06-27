@@ -1,4 +1,4 @@
-package com.infynyty.Task;
+package com.infynyty.Task.Task;
 
 public enum TaskState {
     NOT_INITIALIZED,

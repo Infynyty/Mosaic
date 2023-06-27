@@ -1,8 +1,8 @@
 package com.infynyty.Task.Task;
 
-import com.infynyty.Task.Player.BukkitQuestPlayer;
-import com.infynyty.Task.Player.TaskParticipant;
-import com.infynyty.Task.TaskStartNode;
+import com.infynyty.Task.Participant.BukkitQuestPlayer;
+import com.infynyty.Task.Participant.TaskParticipant;
+import com.infynyty.Task.Graph.TaskStartNode;
 import org.jetbrains.annotations.NotNull;
 
 

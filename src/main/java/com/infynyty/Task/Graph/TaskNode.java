@@ -1,4 +1,4 @@
-package com.infynyty.Task;
+package com.infynyty.Task.Graph;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -8,6 +8,6 @@ public interface TaskNode {
     @NotNull List<TaskNode> getNext();
     @NotNull List<TaskNode> getPrevious();
     @NotNull List<TaskEdge> getOutgoingEdges();
-    void addOutgoingEdge(@NotNull TaskEdge edge);
-    void removeOutgoingEdge(@NotNull TaskEdge edge);
+    void addOutgoingEdge(@NotNull final TaskEdge edge);
+    void removeOutgoingEdge(@NotNull final TaskEdge edge);
 }
