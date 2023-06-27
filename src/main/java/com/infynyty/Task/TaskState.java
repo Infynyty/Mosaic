@@ -1,6 +1,6 @@
-package com.infynyty.Quests;
+package com.infynyty.Task;
 
-public enum QuestState {
+public enum TaskState {
     NOT_INITIALIZED,
     INITIALIZED,
     RUNNING,

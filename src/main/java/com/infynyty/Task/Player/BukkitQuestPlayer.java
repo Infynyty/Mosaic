@@ -1,8 +1,8 @@
-package com.infynyty.Quests.Player;
+package com.infynyty.Task.Player;
 
 public class BukkitQuestPlayer implements QuestPlayer {
     @Override
-    public boolean equals(QuestPartakingEntity other) {
+    public boolean equals(TaskParticipant other) {
         return false;
     }
 }

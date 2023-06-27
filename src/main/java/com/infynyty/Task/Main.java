@@ -1,6 +1,4 @@
-package com.infynyty.Quests;
-
-import com.infynyty.Quests.Quest.MinecraftRunningQuest;
+package com.infynyty.Task;
 
 public class Main {
     public static void main(String[] args) {

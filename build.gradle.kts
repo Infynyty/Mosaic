@@ -3,6 +3,7 @@ plugins {
 }
 
 group = "com.infynyty"
+name = "Mosaic"
 version = "1.0-SNAPSHOT"
 
 repositories {
