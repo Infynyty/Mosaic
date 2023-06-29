@@ -10,9 +10,9 @@ import org.jetbrains.annotations.NotNull;
 
 import static java.lang.Thread.sleep;
 
-public class Main implements Listener {
+public class Main {
     public static void main(String[] args) throws InterruptedException {
-        TaskEvent.addListener(new Main());
+        TaskEvent.addEventListener(new Main());
         final SimpleNode node1 = new SimpleNode("node1");
         final SimpleNode node2 = new SimpleNode("node2");
         final SimpleNode node3 = new SimpleNode("node3");
@@ -39,7 +39,7 @@ public class Main implements Listener {
     }
 
     @EventHandler
-    public void onFinish(TaskCompleteEvent event) {
+    public void onFinish(TaskStartEvent event) {
         SimpleParticipant participant = (SimpleParticipant) event.<SimpleRunningTask>getTask().getParticipant();
         System.out.println("Participant " + participant.getName() + " started");
     }

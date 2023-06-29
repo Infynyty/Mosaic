@@ -15,7 +15,7 @@ import java.util.Optional;
  * @param <E> The type of {@link TaskParticipant} this task should contain.
  */
 @Getter
-public abstract class RunningTask<E extends TaskParticipant> implements Listener {
+public abstract class RunningTask<E extends TaskParticipant> {
 
     @NotNull
     private final E participant;
@@ -46,12 +46,12 @@ public abstract class RunningTask<E extends TaskParticipant> implements Listener
      */
     public void start() {
         this.state = TaskState.RUNNING;
-        TaskEvent.addListener(this);
+        TaskEvent.addEventListener(this);
         new TaskStartEvent<>(this).call();
     }
 
     @EventHandler
-    public void handleEvent(@NotNull final TaskEvent taskEvent) {
+    public void handleEvent(@NotNull final TaskActionEvent taskEvent) {
         if (node.getOutgoingEdges().size() == 0) {
             this.state = TaskState.COMPLETED;
             final TaskCompleteEvent<RunningTask<E>> test = new TaskCompleteEvent<>(this, this.getCurrentNode());
