@@ -17,4 +17,8 @@ public abstract class TaskUpdateEvent<Q extends RunningTask<?>> extends TaskEven
     public TaskUpdateEvent(@NotNull final Q quest) {
         this.quest = quest;
     }
+
+    public <QT extends RunningTask<?>> QT getTask() {
+        return (QT) quest;
+    }
 }

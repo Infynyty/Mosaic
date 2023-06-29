@@ -1,8 +1,8 @@
 package com.infynyty.Task.Events;
 
+import com.infynyty.Task.Graph.TaskNode;
 import com.infynyty.Task.Participant.TaskParticipant;
 import com.infynyty.Task.Task.RunningTask;
-import com.infynyty.Task.Graph.TaskStartNode;
 import com.infynyty.Task.Task.TaskState;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 @Getter
 public class TaskStartEvent<Q extends RunningTask<?>> extends TaskUpdateEvent<Q> {
     @NotNull
-    private final TaskStartNode startNode;
+    private final TaskNode startNode;
 
     public TaskStartEvent(@NotNull final Q quest) {
         super(quest);

@@ -1,9 +1,6 @@
 package com.infynyty.Task.Task;
 
-import com.infynyty.Task.Events.EventHandler;
-import com.infynyty.Task.Events.TaskCompleteEvent;
-import com.infynyty.Task.Events.TaskEvent;
-import com.infynyty.Task.Events.TaskStartEvent;
+import com.infynyty.Task.Events.*;
 import com.infynyty.Task.Participant.TaskParticipant;
 import com.infynyty.Task.Graph.TaskEdgeResponse;
 import com.infynyty.Task.Graph.TaskNode;
@@ -18,7 +15,7 @@ import java.util.Optional;
  * @param <E> The type of {@link TaskParticipant} this task should contain.
  */
 @Getter
-public abstract class RunningTask<E extends TaskParticipant> implements EventHandler {
+public abstract class RunningTask<E extends TaskParticipant> implements Listener {
 
     @NotNull
     private final E participant;
@@ -49,11 +46,17 @@ public abstract class RunningTask<E extends TaskParticipant> implements EventHan
      */
     public void start() {
         this.state = TaskState.RUNNING;
-        TaskEvent.addHandler(this);
+        TaskEvent.addListener(this);
         new TaskStartEvent<>(this).call();
     }
 
+    @EventHandler
     public void handleEvent(@NotNull final TaskEvent taskEvent) {
+        if (node.getOutgoingEdges().size() == 0) {
+            this.state = TaskState.COMPLETED;
+            final TaskCompleteEvent<RunningTask<E>> test = new TaskCompleteEvent<>(this, this.getCurrentNode());
+            test.call();
+        }
         Optional<TaskNode> nextNode = node.getOutgoingEdges()
                 .stream()
                 .map(questEdge -> questEdge.handleEvent(taskEvent))
@@ -69,7 +72,7 @@ public abstract class RunningTask<E extends TaskParticipant> implements EventHan
         }
     }
 
-    protected abstract TaskNode getCurrentNode();
+    protected abstract @NotNull TaskNode getCurrentNode();
     protected abstract void cancel();
 
 }

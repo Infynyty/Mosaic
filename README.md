@@ -1,3 +1,3 @@
 # Mosaic
 
-Mosaic is a a Java API to create event based task graphs.
+Mosaic is a Java API to create event based task graphs.

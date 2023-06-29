@@ -3,7 +3,6 @@ plugins {
 }
 
 group = "com.infynyty"
-name = "Mosaic"
 version = "1.0-SNAPSHOT"
 
 repositories {
@@ -12,11 +11,11 @@ repositories {
 
 dependencies {
     implementation("org.jetbrains:annotations:24.0.0")
-    compileOnly("org.projectlombok:lombok:1.18.16")
-    annotationProcessor("org.projectlombok:lombok:1.18.16")
+    compileOnly("org.projectlombok:lombok:1.18.28")
+    annotationProcessor("org.projectlombok:lombok:1.18.28")
 
-    testCompileOnly("org.projectlombok:lombok:1.18.16")
-    testAnnotationProcessor("org.projectlombok:lombok:1.18.16")
+    testCompileOnly("org.projectlombok:lombok:1.18.28")
+    testAnnotationProcessor("org.projectlombok:lombok:1.18.28")
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 }

@@ -1,14 +1,11 @@
 package com.infynyty.Task.Events;
 
-import org.jetbrains.annotations.NotNull;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-/**
- * This interface is used to handle {@link TaskEvent task events}.
- */
-public interface EventHandler {
-    /**
-     * Handles events. This method should not modify the event itself.
-     * @param event The event to handle.
-     */
-    void handleEvent(@NotNull final TaskEvent event);
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface EventHandler {
 }
