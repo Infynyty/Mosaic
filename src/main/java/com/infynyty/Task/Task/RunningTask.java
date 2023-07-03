@@ -1,13 +1,18 @@
 package com.infynyty.Task.Task;
 
-import com.infynyty.Task.Events.*;
-import com.infynyty.Task.Participant.TaskParticipant;
+import java.util.Optional;
+
+import com.infynyty.Task.Events.EventHandler;
+import com.infynyty.Task.Events.TaskActionEvent;
+import com.infynyty.Task.Events.TaskCancelEvent;
+import com.infynyty.Task.Events.TaskCompleteEvent;
+import com.infynyty.Task.Events.TaskEvent;
+import com.infynyty.Task.Events.TaskStartEvent;
 import com.infynyty.Task.Graph.TaskEdgeResponse;
 import com.infynyty.Task.Graph.TaskNode;
+import com.infynyty.Task.Participant.TaskParticipant;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Optional;
 
 /**
  * This class represents an active instance of {@link Task}. It contains information about {@link TaskParticipant who}
@@ -15,7 +20,7 @@ import java.util.Optional;
  * @param <E> The type of {@link TaskParticipant} this task should contain.
  */
 @Getter
-public abstract class RunningTask<E extends TaskParticipant> {
+public class RunningTask<E extends TaskParticipant> {
 
     @NotNull
     private final E participant;
@@ -24,7 +29,7 @@ public abstract class RunningTask<E extends TaskParticipant> {
     @NotNull
     private TaskState state;
     @NotNull
-    private TaskNode node;
+    private TaskNode currentNode;
 
     /**
      * Initializes a new running task. This sets its {@link TaskState state} to {@link TaskState#INITIALIZED}. To start
@@ -35,7 +40,7 @@ public abstract class RunningTask<E extends TaskParticipant> {
     protected RunningTask(@NotNull final E participant, @NotNull final Task<?> task) {
         this.participant = participant;
         this.task = task;
-        this.node = task.getStartNode();
+        this.currentNode = task.getStartNode();
         this.state = TaskState.INITIALIZED;
     }
 
@@ -47,32 +52,42 @@ public abstract class RunningTask<E extends TaskParticipant> {
     public void start() {
         this.state = TaskState.RUNNING;
         TaskEvent.addEventListener(this);
-        new TaskStartEvent<>(this).call();
+        new TaskStartEvent(this).call();
     }
 
+    /**
+     * Cancels a running task, i.e. sets its {@link TaskState} to {@link TaskState#CANCELLED}. The current node can no longer
+     * be changed by any events. This also triggers a {@link TaskCancelEvent}.
+     */
+    public void cancel() {
+        this.state = TaskState.CANCELLED;
+        TaskEvent.removeEventListener(this);
+        new TaskCancelEvent(this).call();
+    }
+
+    /**
+     * Delegates an event to the currently active node and its corresponding edges.
+     * @param taskEvent The event to be handled.
+     */
     @EventHandler
     public void handleEvent(@NotNull final TaskActionEvent taskEvent) {
-        if (node.getOutgoingEdges().size() == 0) {
+        if (currentNode.getOutgoingEdges().size() == 0) {
             this.state = TaskState.COMPLETED;
-            final TaskCompleteEvent<RunningTask<E>> test = new TaskCompleteEvent<>(this, this.getCurrentNode());
+            final TaskCompleteEvent test = new TaskCompleteEvent(this, this.getCurrentNode());
             test.call();
         }
-        Optional<TaskNode> nextNode = node.getOutgoingEdges()
+        Optional<TaskNode> nextNode = currentNode.getOutgoingEdges()
                 .stream()
-                .map(questEdge -> questEdge.handleEvent(taskEvent))
-                .filter(taskEdgeResponse -> taskEdgeResponse.getResponseType() == TaskEdgeResponse.QuestEdgeResponseType.CHANGE_NODE)
+                .map(questEdge -> questEdge.getEventHandler().apply(taskEvent))
+                .filter(taskEdgeResponse -> taskEdgeResponse.getResponseType() == TaskEdgeResponse.Type.CHANGE_NODE)
                 .map(TaskEdgeResponse::getQuestNode)
                 .findAny();
         if (nextNode.isEmpty()) return;
-        this.node = nextNode.get();
-        if (node.getOutgoingEdges().size() == 0) {
+        this.currentNode = nextNode.get();
+        if (currentNode.getOutgoingEdges().size() == 0) {
             this.state = TaskState.COMPLETED;
-            final TaskCompleteEvent<RunningTask<E>> test = new TaskCompleteEvent<>(this, this.getCurrentNode());
+            final TaskCompleteEvent test = new TaskCompleteEvent(this, this.getCurrentNode());
             test.call();
         }
     }
-
-    protected abstract @NotNull TaskNode getCurrentNode();
-    protected abstract void cancel();
-
 }

@@ -5,6 +5,6 @@ package com.infynyty.Task.Events;
  * to {@link TaskUpdateEvent task update events}, these events are not triggered by a task itself, but by an external
  * source.
  */
-public abstract class TaskActionEvent extends TaskEvent {
+public abstract non-sealed class TaskActionEvent extends TaskEvent {
 
 }

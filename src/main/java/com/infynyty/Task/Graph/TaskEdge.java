@@ -1,11 +1,10 @@
 package com.infynyty.Task.Graph;
 
-import com.infynyty.Task.Events.TaskEvent;
+import java.util.function.Function;
+
+import com.infynyty.Task.Events.TaskActionEvent;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-
 public interface TaskEdge {
-    @NotNull TaskEdgeResponse handleEvent(@NotNull final TaskEvent event);
-    @NotNull List<TaskEvent> getAwaitedEvents();
+    @NotNull Function<TaskActionEvent, TaskEdgeResponse> getEventHandler();
 }

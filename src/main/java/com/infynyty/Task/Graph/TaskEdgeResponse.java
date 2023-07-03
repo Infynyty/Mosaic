@@ -4,12 +4,12 @@ import com.infynyty.Task.Task.TaskNotRunning;
 import org.jetbrains.annotations.NotNull;
 
 public interface TaskEdgeResponse {
-    @NotNull QuestEdgeResponseType getResponseType();
+    @NotNull Type getResponseType();
 
     @NotNull TaskNode getQuestNode() throws TaskNotRunning;
 
 
-    enum QuestEdgeResponseType {
+    enum Type {
         NOT_APPLICABLE,
         CHANGE_NODE,
         REPEAT_NODE

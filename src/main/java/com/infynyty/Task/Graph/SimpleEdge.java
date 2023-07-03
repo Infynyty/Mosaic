@@ -1,28 +1,22 @@
 package com.infynyty.Task.Graph;
 
-import com.infynyty.Task.Events.TaskEvent;
-import org.jetbrains.annotations.NotNull;
+import java.util.function.Function;
 
-import java.util.List;
+import com.infynyty.Task.Events.TaskActionEvent;
+import org.jetbrains.annotations.NotNull;
 
 public class SimpleEdge implements TaskEdge {
     private final String name;
-    private final SimpleNode next;
+    private final Function<TaskActionEvent, TaskEdgeResponse> eventHandler;
 
-    public SimpleEdge(SimpleNode next, String name) {
+    public SimpleEdge(String name, Function<TaskActionEvent, TaskEdgeResponse> eventHandler) {
         this.name = name;
-        this.next = next;
+        this.eventHandler = eventHandler;
     }
 
 
     @Override
-    public @NotNull TaskEdgeResponse handleEvent(@NotNull TaskEvent event) {
-        System.out.println("Edge name: " + name);
-        return new SimpleResponse(next, TaskEdgeResponse.QuestEdgeResponseType.CHANGE_NODE);
-    }
-
-    @Override
-    public @NotNull List<TaskEvent> getAwaitedEvents() {
-        return null;
+    public @NotNull Function<TaskActionEvent, TaskEdgeResponse> getEventHandler() {
+        return eventHandler;
     }
 }

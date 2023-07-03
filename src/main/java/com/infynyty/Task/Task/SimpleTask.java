@@ -1,11 +1,15 @@
 package com.infynyty.Task.Task;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.infynyty.Task.Graph.TaskNode;
 import com.infynyty.Task.Participant.SimpleParticipant;
 import com.infynyty.Task.Participant.TaskParticipant;
 import org.jetbrains.annotations.NotNull;
 
-public class SimpleTask extends Task<SimpleRunningTask> {
+public class SimpleTask extends Task<RunningTask<SimpleParticipant>> {
+    private final Map<TaskParticipant, RunningTask<SimpleParticipant>> runningTasks = new HashMap<>();
     /**
      * Creates a new task. Any task is required to have exactly one {@link TaskNode start node}.
      *
@@ -17,17 +21,21 @@ public class SimpleTask extends Task<SimpleRunningTask> {
 
     @Override
     public void initialize(@NotNull TaskParticipant participant) throws TaskAlreadyRunning {
-        final SimpleRunningTask runningTask = new SimpleRunningTask((SimpleParticipant) participant, this);
+        final RunningTask<SimpleParticipant> runningTask = new RunningTask<>((SimpleParticipant) participant, this);
+        runningTasks.put(participant, runningTask);
         runningTask.start();
     }
 
     @Override
-    protected void cancel(@NotNull TaskParticipant participant) throws TaskNotRunning {
+    protected void remove(@NotNull TaskParticipant participant) throws TaskNotRunning {
+        final RunningTask<SimpleParticipant> runningTask = getTaskProgress(participant);
+        runningTask.cancel();
 
     }
 
     @Override
-    public SimpleRunningTask getTaskProgress(@NotNull TaskParticipant participant) throws TaskNotRunning {
-        return null;
+    public @NotNull RunningTask<SimpleParticipant> getTaskProgress(@NotNull TaskParticipant participant) throws TaskNotRunning {
+        if (!runningTasks.containsKey(participant)) throw new TaskNotRunning(participant, this);
+        return runningTasks.get(participant);
     }
 }

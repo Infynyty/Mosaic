@@ -13,13 +13,13 @@ import org.jetbrains.annotations.NotNull;
  * switches from {@link TaskState#INITIALIZED} to {@link TaskState#RUNNING}.
  */
 @Getter
-public class TaskStartEvent<Q extends RunningTask<?>> extends TaskUpdateEvent<Q> {
+public class TaskStartEvent extends TaskUpdateEvent {
     @NotNull
     private final TaskNode startNode;
 
-    public TaskStartEvent(@NotNull final Q quest) {
-        super(quest);
-        this.startNode = quest.getTask().getStartNode();
+    public TaskStartEvent(@NotNull final RunningTask<?> task) {
+        super(task);
+        this.startNode = task.getTask().getStartNode();
     }
 
 }

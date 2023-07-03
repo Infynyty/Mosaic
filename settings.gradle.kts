@@ -1,2 +1,2 @@
-rootProject.name = "Quests"
+rootProject.name = "Mosaic"
 

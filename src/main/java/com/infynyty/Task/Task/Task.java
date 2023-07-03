@@ -1,13 +1,13 @@
 package com.infynyty.Task.Task;
 
 
-import com.infynyty.Task.Participant.TaskParticipant;
+import java.util.UUID;
+
 import com.infynyty.Task.Graph.TaskNode;
+import com.infynyty.Task.Participant.TaskParticipant;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.UUID;
 
 /**
  * Each object of this type represents a task. A Task consists of exactly one {@link TaskNode start node} and
@@ -66,6 +66,14 @@ public abstract class Task<R extends RunningTask<?>> {
      * @return The task progress for the given {@link TaskParticipant participant}.
      * @throws TaskNotRunning If the task is not currently running. Check with {@link #isRunning(TaskParticipant)} before calling this method.
      */
-    public abstract R getTaskProgress(@NotNull final TaskParticipant participant) throws TaskNotRunning;
-    protected abstract void cancel(@NotNull final TaskParticipant participant) throws TaskNotRunning;
+    public abstract @NotNull R getTaskProgress(@NotNull final TaskParticipant participant) throws TaskNotRunning;
+
+    /**
+     * Removes the {@link R running task} for a given participant, if present. Prior to removing it, the method
+     * should cancel the running task, so that there are no running tasks, that cannot be referenced using {@link #getTaskProgress(TaskParticipant)}.
+     *
+     * @param participant The participant for which the task should be cancelled.
+     * @throws TaskNotRunning If there is no running task for the participant.
+     */
+    protected abstract void remove(@NotNull final TaskParticipant participant) throws TaskNotRunning;
 }
