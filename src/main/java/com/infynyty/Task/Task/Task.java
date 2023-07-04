@@ -1,79 +1,96 @@
 package com.infynyty.Task.Task;
 
-
-import java.util.UUID;
-
+import com.infynyty.Task.Events.EventHandler;
+import com.infynyty.Task.Events.TaskActionEvent;
+import com.infynyty.Task.Events.TaskCancelEvent;
+import com.infynyty.Task.Events.TaskCompleteEvent;
+import com.infynyty.Task.Events.TaskEvent;
+import com.infynyty.Task.Events.TaskNodeChangeEvent;
+import com.infynyty.Task.Events.TaskNodeRepeatEvent;
+import com.infynyty.Task.Events.TaskStartEvent;
+import com.infynyty.Task.Graph.TaskEdgeResponse;
 import com.infynyty.Task.Graph.TaskNode;
 import com.infynyty.Task.Participant.TaskParticipant;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Each object of this type represents a task. A Task consists of exactly one {@link TaskNode start node} and
- * optionally any number of {@link TaskNode other nodes}, which can be thought of as a directed graph.
- * This also implies that {@link TaskNode nodes} may have self-loops and multiple neighbours.
- * A task can generate a {@link RunningTask running task} for a {@link TaskParticipant participant} by calling
- * {@link #initialize(TaskParticipant)}. At any time there may be at most one {@link RunningTask running task}, given
- * a {@link TaskParticipant participant} and a task instance, to ensure that any {@link TaskParticipant participant} can
- * be mapped to a {@link TaskNode task node} and {@link TaskState state} unambiguously.
+ * This class represents an active instance of {@link TaskSupervisor}. It contains information about {@link TaskParticipant who}
+ * is concerned by this task and which state they are in. It also updates the state according to occurring {@link TaskEvent events}.
+ * @param <P> The type of {@link TaskParticipant} this task should contain.
  */
 @Getter
-@EqualsAndHashCode(of = "id")
-public abstract class Task<R extends RunningTask<?>> {
+public class Task<P extends TaskParticipant> {
 
-    private final TaskNode startNode;
-
-    private final UUID id = UUID.randomUUID();
+    @NotNull
+    private final P participant;
+    @NotNull
+    private final TaskSupervisor<P, Task<P>> taskSupervisor;
+    @NotNull
+    private TaskState state;
+    @NotNull
+    private TaskNode currentNode;
 
     /**
-     * Creates a new task. Any task is required to have exactly one {@link TaskNode start node}.
-     *
-     * @param startNode The single entry point of the task.
+     * Initializes a new running task. This sets its {@link TaskState state} to {@link TaskState#INITIALIZED}. To start
+     * it use {@link #start()}.
+     * @param participant The participant for this running task.
+     * @param taskSupervisor The task that created this running task.
      */
-    public Task(@NotNull final TaskNode startNode) {
-        this.startNode = startNode;
+    public Task(@NotNull final P participant, @NotNull final TaskSupervisor<P, Task<P>> taskSupervisor) {
+        this.participant = participant;
+        this.taskSupervisor = taskSupervisor;
+        this.currentNode = taskSupervisor.getStartNode();
+        this.state = TaskState.INITIALIZED;
     }
 
+    /**
+     * Starts this running task, i.e. sets its {@link TaskState} to {@link TaskState#RUNNING}. The current node of this
+     * running task can now be changed by the corresponding {@link TaskEvent events}. This also triggers a
+     * {@link TaskStartEvent}.
+     */
+    public void start() {
+        TaskEvent.addEventListener(this);
+        new TaskStartEvent(this).call();
+        this.state = TaskState.RUNNING;
+    }
 
     /**
-     * Allows to safely check whether a task is running for a given {@link TaskParticipant participant}.
-     * @param participant The entity for which the task is checked.
-     * @return {@code True} if and only if a {@link RunningTask running task} exists for the given {@link TaskParticipant participant}
-     * and has the state {@link TaskState#RUNNING}.
+     * Cancels a running task, i.e. sets its {@link TaskState} to {@link TaskState#CANCELLED}. The current node can no longer
+     * be changed by any events. This also triggers a {@link TaskCancelEvent}.
      */
-    public final boolean isRunning(@NotNull final TaskParticipant participant) {
-        try {
-            return getTaskProgress(participant).getState() == TaskState.RUNNING;
-        } catch (TaskNotRunning taskNotRunning) {
-            return false;
+    public void cancel() {
+        TaskEvent.removeEventListener(this);
+        new TaskCancelEvent(this).call();
+        this.state = TaskState.CANCELLED;
+    }
+
+    /**
+     * Delegates an event to the currently active node and its corresponding edges.
+     * @param taskEvent The event to be handled.
+     */
+    @EventHandler
+    public void handleEvent(@NotNull final TaskActionEvent taskEvent) {
+        // handles the case where a task consists of a single node
+        if (!currentNode.hasEdgeResolver()) handleTaskCompletion();
+
+        final TaskEdgeResponse response = currentNode.getEdgeResolver().resolveEdge().apply(taskEvent);
+        if (response.getResponseType() == TaskEdgeResponse.Type.CHANGE_NODE) {
+            final TaskNodeChangeEvent nodeChangeEvent = new TaskNodeChangeEvent(this, this.currentNode, response.getTaskNode());
+            this.currentNode = response.getTaskNode();
+            nodeChangeEvent.call();
+        } else if (response.getResponseType() == TaskEdgeResponse.Type.REPEAT_NODE) {
+            final TaskNodeRepeatEvent nodeRepeatEvent = new TaskNodeRepeatEvent(this, this.currentNode);
+            nodeRepeatEvent.call();
         }
+
+        if (!currentNode.hasEdgeResolver()) handleTaskCompletion();
     }
 
-    /**
-     * Initializes a new task for a given {@link TaskParticipant participant}.
-     * @param participant The entity for which the task is started.
-     * @throws TaskAlreadyRunning Since there may be at most one {@link RunningTask running task} for a given {@link TaskParticipant participant}
-     * and {@link Task task instance}, this exception is thrown if a {@link RunningTask running task} already exists
-     * for this {@link TaskParticipant participant}.
-     */
-    public abstract void initialize(@NotNull final TaskParticipant participant) throws TaskAlreadyRunning;
-
-
-    /**
-     * Gets the task progress for a given {@link TaskParticipant participant}.
-     * @param participant The participant for which the task progress is requested.
-     * @return The task progress for the given {@link TaskParticipant participant}.
-     * @throws TaskNotRunning If the task is not currently running. Check with {@link #isRunning(TaskParticipant)} before calling this method.
-     */
-    public abstract @NotNull R getTaskProgress(@NotNull final TaskParticipant participant) throws TaskNotRunning;
-
-    /**
-     * Removes the {@link R running task} for a given participant, if present. Prior to removing it, the method
-     * should cancel the running task, so that there are no running tasks, that cannot be referenced using {@link #getTaskProgress(TaskParticipant)}.
-     *
-     * @param participant The participant for which the task should be cancelled.
-     * @throws TaskNotRunning If there is no running task for the participant.
-     */
-    protected abstract void remove(@NotNull final TaskParticipant participant) throws TaskNotRunning;
+    private void handleTaskCompletion() {
+        TaskEvent.removeEventListener(this);
+        this.state = TaskState.COMPLETED;
+        final TaskCompleteEvent completeEvent = new TaskCompleteEvent(this, this.getCurrentNode());
+        completeEvent.call();
+    }
 }

@@ -1,6 +1,6 @@
 package com.infynyty.Task.Graph;
 
-import com.infynyty.Task.Task.TaskNotRunning;
+import com.infynyty.Task.Task.TaskNotRunningException;
 import org.jetbrains.annotations.NotNull;
 
 public class SimpleResponse implements TaskEdgeResponse {
@@ -19,7 +19,7 @@ public class SimpleResponse implements TaskEdgeResponse {
     }
 
     @Override
-    public @NotNull TaskNode getQuestNode() throws TaskNotRunning {
+    public @NotNull TaskNode getTaskNode() throws TaskNotRunningException {
         return next;
     }
 }

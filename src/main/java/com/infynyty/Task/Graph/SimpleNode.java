@@ -1,13 +1,12 @@
 package com.infynyty.Task.Graph;
 
-import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
 import java.util.List;
+
+import org.jetbrains.annotations.NotNull;
 
 public class SimpleNode implements TaskNode {
     private final String name;
-    private final List<TaskEdge> outgoingEdges = new ArrayList<>();
+    private TaskEdgeResolver edgeResolver;
 
     public SimpleNode(String name) {
         this.name = name;
@@ -25,17 +24,17 @@ public class SimpleNode implements TaskNode {
     }
 
     @Override
-    public @NotNull List<TaskEdge> getOutgoingEdges() {
-        return outgoingEdges;
+    public @NotNull TaskEdgeResolver getEdgeResolver() {
+        return edgeResolver;
     }
 
     @Override
-    public void addOutgoingEdge(@NotNull TaskEdge edge) {
-        outgoingEdges.add(edge);
+    public boolean hasEdgeResolver() {
+        return edgeResolver == null;
     }
 
     @Override
-    public void removeOutgoingEdge(@NotNull TaskEdge edge) {
-
+    public void setEdgeResolver(@NotNull TaskEdgeResolver edgeResolver) {
+        this.edgeResolver = edgeResolver;
     }
 }

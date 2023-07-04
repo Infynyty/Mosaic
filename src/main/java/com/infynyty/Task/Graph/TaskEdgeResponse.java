@@ -1,12 +1,12 @@
 package com.infynyty.Task.Graph;
 
-import com.infynyty.Task.Task.TaskNotRunning;
+import com.infynyty.Task.Task.TaskNotRunningException;
 import org.jetbrains.annotations.NotNull;
 
 public interface TaskEdgeResponse {
     @NotNull Type getResponseType();
 
-    @NotNull TaskNode getQuestNode() throws TaskNotRunning;
+    @NotNull TaskNode getTaskNode() throws TaskNotRunningException;
 
 
     enum Type {
