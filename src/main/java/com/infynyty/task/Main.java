@@ -18,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
 public class Main {
     public static void main(String[] args) {
         TaskEvent.addEventListener(new Main());
-        final SimpleNode node1 = new SimpleNode("Try typing some text.");
+        final SimpleNode node1 = new SimpleNode("Try typing some text...");
         final SimpleNode node2 = new SimpleNode("You win.");
 
         final SimpleEdgeResolver edge1 = new SimpleEdgeResolver("Wrong text", taskActionEvent -> {

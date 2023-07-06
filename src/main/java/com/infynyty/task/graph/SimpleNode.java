@@ -16,8 +16,8 @@ public class SimpleNode implements TaskNode {
     }
 
     @Override
-    public boolean hasEdgeResolver() {
-        return edgeResolver != null;
+    public boolean isTerminalNode() {
+        return edgeResolver == null;
     }
 
     @Override

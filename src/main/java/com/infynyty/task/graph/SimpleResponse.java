@@ -1,6 +1,5 @@
 package com.infynyty.task.graph;
 
-import com.infynyty.task.tasks.TaskNotRunningException;
 import org.jetbrains.annotations.NotNull;
 
 public class SimpleResponse implements TaskEdgeResponse {
@@ -19,7 +18,7 @@ public class SimpleResponse implements TaskEdgeResponse {
     }
 
     @Override
-    public @NotNull TaskNode getTaskNode() throws TaskNotRunningException {
+    public @NotNull TaskNode getTaskNode() {
         return next;
     }
 }

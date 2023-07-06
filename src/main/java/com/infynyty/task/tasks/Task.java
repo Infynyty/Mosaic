@@ -52,7 +52,7 @@ public class Task<P extends TaskParticipant> {
     public void start() {
         new TaskStartEvent(this).call();
         this.state = TaskState.RUNNING;
-        if (currentNode.hasEdgeResolver()) {
+        if (!currentNode.isTerminalNode()) {
             TaskEvent.addEventListener(this);
         } else {
             handleTaskCompletion();
@@ -85,7 +85,7 @@ public class Task<P extends TaskParticipant> {
             nodeRepeatEvent.call();
         }
 
-        if (!currentNode.hasEdgeResolver()) handleTaskCompletion();
+        if (currentNode.isTerminalNode()) handleTaskCompletion();
     }
 
     private void handleTaskCompletion() {
