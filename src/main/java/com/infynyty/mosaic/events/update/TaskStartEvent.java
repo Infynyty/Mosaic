@@ -22,5 +22,4 @@ public class TaskStartEvent extends TaskUpdateEvent {
         super(task);
         this.startNode = task.getTaskSupervisor().getStartNode();
     }
-
 }

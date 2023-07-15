@@ -17,7 +17,7 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        TaskEvent.addEventListener(new Main());
+        EventHandler.getInstance().addHandler(TypeEvent.class, Main::hi);
         final SimpleNode node1 = new SimpleNode("Try typing some text...", () -> System.out.println("Not again!"));
         final SimpleNode node2 = new SimpleNode("You win.", () -> System.out.println("You entered the node 2!"));
 
@@ -39,18 +39,11 @@ public class Main {
             final Scanner scanner = new Scanner(System.in);
             System.out.print("Input something!");
             final String res = scanner.next();
-            new TypeEvent(res).call();
+            EventHandler.getInstance().callEvent(new TypeEvent(res));
         }
     }
 
-    @EventHandler
-    public void handleEvent(@NotNull TypeEvent event) {
-        System.out.println("Simple event name: " + event.getText());
-    }
-
-    @EventHandler
-    public void onFinish(TaskStartEvent event) {
-        if (!(event.getTask().getParticipant() instanceof SimpleParticipant participant)) return;
-        System.out.println("Participant " + participant.getName() + " started");
+    private static void hi(TaskEvent event) {
+        System.out.println("hi");
     }
 }

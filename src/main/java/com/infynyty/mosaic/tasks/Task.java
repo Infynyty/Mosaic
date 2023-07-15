@@ -46,10 +46,10 @@ public class Task<P extends TaskParticipant, S extends TaskSupervisor<P, ?>> {
      * {@link TaskStartEvent}.
      */
     public void start() {
-        new TaskStartEvent(this).call();
+        EventHandler.getInstance().callEvent(new TaskStartEvent(this));
         this.state = TaskState.RUNNING;
         if (!currentNode.isTerminalNode()) {
-            TaskEvent.addEventListener(this);
+            EventHandler.getInstance().addHandler(TaskActionEvent.class, this::handleEvent);
         } else {
             handleTaskCompletion();
         }
@@ -60,8 +60,9 @@ public class Task<P extends TaskParticipant, S extends TaskSupervisor<P, ?>> {
      * be changed by any events. This also triggers a {@link TaskCancelEvent}.
      */
     public void cancel() {
-        TaskEvent.removeEventListener(this);
-        new TaskCancelEvent(this).call();
+        EventHandler.getInstance().removeHandler(TaskActionEvent.class, this::handleEvent);
+        final TaskCancelEvent cancelEvent = new TaskCancelEvent(this);
+        EventHandler.getInstance().callEvent(cancelEvent);
         this.state = TaskState.CANCELLED;
     }
 
@@ -69,24 +70,24 @@ public class Task<P extends TaskParticipant, S extends TaskSupervisor<P, ?>> {
      * Delegates an event to the currently active node and its corresponding edges.
      * @param taskEvent The event to be handled.
      */
-    @EventHandler
-    public void handleEvent(@NotNull final TaskActionEvent taskEvent) {
-        final TaskEdgeResponse response = currentNode.getEdgeResolver().resolveEdge().apply(taskEvent);
+    public void handleEvent(@NotNull final TaskEvent taskEvent) {
+        if (!(taskEvent instanceof TaskActionEvent taskActionEvent)) return;
+        final TaskEdgeResponse response = currentNode.getEdgeResolver().resolveEdge().apply(taskActionEvent);
         if (response.getResponseType() == TaskEdgeResponse.Type.CHANGE_NODE) {
             final TaskNodeChangeEvent nodeChangeEvent = new TaskNodeChangeEvent(this, this.currentNode, response.getTaskNode());
             this.currentNode = response.getTaskNode();
-            nodeChangeEvent.call();
+            EventHandler.getInstance().callEvent(nodeChangeEvent);
             if (currentNode.isTerminalNode()) handleTaskCompletion();
         } else if (response.getResponseType() == TaskEdgeResponse.Type.REPEAT_NODE) {
             final TaskNodeRepeatEvent nodeRepeatEvent = new TaskNodeRepeatEvent(this, this.currentNode);
-            nodeRepeatEvent.call();
+            EventHandler.getInstance().callEvent(nodeRepeatEvent);
         }
     }
 
     private void handleTaskCompletion() {
-        TaskEvent.removeEventListener(this);
+        EventHandler.getInstance().removeHandler(TaskActionEvent.class, this::handleEvent);
         this.state = TaskState.COMPLETED;
         final TaskCompleteEvent completeEvent = new TaskCompleteEvent(this, this.getCurrentNode());
-        completeEvent.call();
+        EventHandler.getInstance().callEvent(completeEvent);
     }
 }

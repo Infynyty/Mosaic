@@ -1,6 +1,5 @@
 package com.infynyty.mosaic.graph;
 
-import com.infynyty.mosaic.events.EventHandler;
 import com.infynyty.mosaic.events.TaskEvent;
 import com.infynyty.mosaic.events.update.TaskNodeRepeatEvent;
 import org.jetbrains.annotations.NotNull;
@@ -11,7 +10,6 @@ public class SimpleNode implements TaskNode {
     private TaskEdgeResolver edgeResolver;
 
     public SimpleNode(String name, Runnable onEnter) {
-        TaskEvent.addEventListener(this);
         this.name = name;
         this.onEnter = onEnter;
     }
@@ -31,10 +29,4 @@ public class SimpleNode implements TaskNode {
         this.edgeResolver = edgeResolver;
     }
 
-    @EventHandler
-    public void onTaskEvent(TaskNodeRepeatEvent event) {
-        if (event.getNode() == this) {
-            onEnter.run();
-        }
-    }
 }
